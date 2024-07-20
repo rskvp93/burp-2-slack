@@ -19,7 +19,7 @@ Burp2Slack extension matches all BurpSuite traffics (Intruder, Repeater, Proxy a
 When one of the above conditions met, then it pushes a notification to either a Slack channel or Custom server. The notification message is customized and can be edited/formatted by the user to get the met "condition/s" and/or the HTTP response body that includes the conditions. 
 ### Main Features
 * Poll Notifications every X seconds.
-* Customize your notification using {{FOUND}} which is your input condition and {{BODY}} which returns response body.
+* Customize your notification using {{FOUND}} which is your input condition, {{URL}} is the url request and {{BODY}} which returns response body.
 * Match response body, HTTP headers, content length and HTTP status code.
 * Use the logical operators !, =, < and > in the content length field.
 * Support both Slack webhook and custom HTTP listeners.

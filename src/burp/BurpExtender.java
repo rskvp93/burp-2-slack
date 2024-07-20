@@ -30,7 +30,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         this.callbacks = callbacks;
         BurpExtenderTab.callbacks = callbacks;
 
-        callbacks.setExtensionName("Burp2Slack Extension");
+        callbacks.setExtensionName("Burp2Slack");
         callbacks.printOutput("Burp2Slack 1.0 loaded");
 
         BurpExtenderTab.configcomp = new ConfigComponent(callbacks);
@@ -108,7 +108,11 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             TimerTask task = new TimerTask() {
                 public void run() {
 
-                    Match2Slack();
+                    try {
+                        Match2Slack();
+                    } catch (Exception e) {
+                        callbacks.printOutput("Match2Slack error: "+e);
+                    }
 
                 }
             };
@@ -132,6 +136,11 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                     // Parse Intruder Response
                     int responseStatusCode = res.getStatusCode();
                     ArrayList<String> responseHeaders = new ArrayList<>(res.getHeaders());
+
+                    // Get the request info
+                    IRequestInfo requestInfo = callbacks.getHelpers().analyzeRequest(log.get(i).requestResponse);
+                    // Extract the URL
+                    String URL_REQUEST = requestInfo.getUrl().toString();
 
 
                     int bodyOffset = res.getBodyOffset();
@@ -174,6 +183,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                 this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",responseBodyInput);
                                 this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
 
+                                this.getCurrentPayload = this.getCurrentPayload.replace("{{URL}}", URL_REQUEST);
+
                                 pushMessage();
 
                             }
@@ -187,6 +198,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                 this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                         " " + responseStatusCode);
                                 this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
+
+                                this.getCurrentPayload = this.getCurrentPayload.replace("{{URL}}", URL_REQUEST);
 
                                 pushMessage();
 
@@ -203,6 +216,9 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                     this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                             responseHeaders.get(ii).toString().replace("\"", "\\\""));
                                     this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", responseHeaders.get(ii).toString().replace("\"", "\\\""));
+
+                                    this.getCurrentPayload = this.getCurrentPayload.replace("{{URL}}", URL_REQUEST);
+
                                     pushMessage();
                                     ii = responseHeaders.size();
 
@@ -224,6 +240,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                         this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                                 " > " + targetlength);
                                         this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
+
+                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{URL}}", URL_REQUEST);
                                         pushMessage();
                                     }
                                     break;
@@ -233,6 +251,9 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                         this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                                 " < " + targetlength);
                                         this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
+
+                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{URL}}", URL_REQUEST);
+
                                         pushMessage();
                                     }
                                     break;
@@ -242,6 +263,9 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                         this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                                 " == " + targetlength);
                                         this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
+
+                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{URL}}", URL_REQUEST);
+
                                         pushMessage();
                                     }
                                     break;
@@ -251,6 +275,9 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
                                         this.getCurrentPayload = BurpExtenderTab.configcomp.msgformattxtbox.getText().toString().replace("{{FOUND}}",
                                                 " != " + targetlength);
                                         this.getCurrentPayload = this.getCurrentPayload.replace("{{BODY}}", getBody);
+
+                                        this.getCurrentPayload = this.getCurrentPayload.replace("{{URL}}", URL_REQUEST);
+
                                         pushMessage();
                                     }
                                     break;
